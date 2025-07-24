@@ -62,10 +62,11 @@ export default function Index() {
     </TouchableOpacity>
   </LinearGradient>
 </View>
-
-
       </LinearGradient>
       </View>
+
+
+
       
   );
 }
