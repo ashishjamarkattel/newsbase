@@ -1,9 +1,17 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import TInderCard from '@/components/Cards/TInderCard';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Swiper from 'react-native-deck-swiper';
+import React, { useCallback, useRef, useState } from 'react';
+import {
+  Animated,
+  Image,
+  PanResponder,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Home = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -13,18 +21,19 @@ const Home = () => {
   default: { fontSize: 16, marginRight: 5 },
 };
 
-  const cards = [
+
+  const [cards, setData] = useState([
     {
       id: '1',
       image: require('../../assets/images/stupa-Nepal-iGuzzini-04.jpg'),
       title: 'Demand for Indian generic drugs skyrockets in...',
       subtitle: 'Updated just now.',
       author: 'Wade Warren',
-      description: 'The demand for Indian generic drugs has shot up in China amid the massive COVID surge in the country, with Chinese experts cautioning that fake versions of these drugs are flooding the market.'
+      description: 'The demand for Indian generic drugs has shrot up in China amid the massive COVID surge in the country, with Chinese experts cautioning that fake versions of these drugs are flooding the market.'
     },
     {
       id: '2',
-      image: require('../../assets/images/partial-react-logo.png'),
+      image: require('../../assets/images/icon.png'),
       title: 'React Native is awesome!',
       subtitle: '5 min ago',
       author: 'Jane Doe',
@@ -32,21 +41,96 @@ const Home = () => {
     },
     {
       id: '3',
-      image: require('../../assets/images/splash-icon.png'),
+      image: require("../../assets/images/pexels-photo-3825539.jpeg"),
       title: 'Breaking News: Expo Update',
       subtitle: '10 min ago',
       author: 'John Smith',
       description: 'Expo just released a new update with exciting features for developers.'
     }
-  ];
+  ]);
+
+
+
+
+  const originalCards = useRef([
+  {
+    id: '1',
+    image: require('../../assets/images/stupa-Nepal-iGuzzini-04.jpg'),
+    title: 'Demand for Indian generic drugs skyrockets in...',
+    subtitle: 'Updated just now.',
+    author: 'Wade Warren',
+    description: 'The demand for Indian generic drugs has shrot up in China amid the massive COVID surge in the country, with Chinese experts cautioning that fake versions of these drugs are flooding the market.'
+  },
+  {
+    id: '2',
+    image: require('../../assets/images/icon.png'),
+    title: 'React Native is awesome!',
+    subtitle: '5 min ago',
+    author: 'Jane Doe',
+    description: 'React Native lets you build mobile apps using only JavaScript and React.'
+  },
+  {
+    id: '3',
+    image: require("../../assets/images/pexels-photo-3825539.jpeg"),
+    title: 'Breaking News: Expo Update',
+    subtitle: '10 min ago',
+    author: 'John Smith',
+    description: 'Expo just released a new update with exciting features for developers.'
+  }
+]).current;
+
+
+
+
+
+  const swipe= useRef(new Animated.ValueXY()).current
+
+  const panResponder = PanResponder.create({
+  onMoveShouldSetPanResponder: () => true,
+  onPanResponderMove: Animated.event(
+    [null, { dx: swipe.x, dy: swipe.y }],
+    { useNativeDriver: false }
+  ),
+  onPanResponderRelease: (_, { dx, dy }) => {
+    const direction = Math.sign(dx);
+    const isActionActive = Math.abs(dx) > 200;
+
+    if (isActionActive) {
+      Animated.timing(swipe, {
+        toValue: { x: 500 * direction, y: dy },
+        useNativeDriver: true,
+        duration: 200,
+      }).start(() => {
+        removeCard();
+      });
+    } else {
+      Animated.spring(swipe, {
+        toValue: { x: 0, y: 0 },
+        useNativeDriver: true,
+        friction: 4,
+      }).start();
+    }
+  }
+});
+
+
+  const removeCard = useCallback(()=>{
+      setData(prev=>prev.slice(1))
+
+       requestAnimationFrame(() => {
+      swipe.setValue({x:0, y:0})
+
+       });
+  }, [swipe])
+
+
 
   return (
-
-    
+// bg-[#11131F]
+    <SafeAreaView className='flex-1 bg-[#11131F]'>
     <View className='flex-1 bg-[#11131F]'>
       <StatusBar style='dark' />
-      
-      <View style={{ height: 70 }} className='flex-row justify-between items-center mt-12 mx-2'>
+      <View style={{ height: 70, padding:0}} className='flex-row justify-between items-center mx-2'>
         {/* Logo */}
         <Image
           source={require("../../assets/images/logo2.png")}
@@ -61,15 +145,16 @@ const Home = () => {
           className='mr-3'
         />
         </TouchableOpacity>
-      </View>
 
-      {dropdownOpen && (
-        <View className='absolute right-4 top-[110] bg-white rounded-md shadow-lg px-10 py-3'>
+        {dropdownOpen && (
+        <View className='absolute right-4 top-[50] bg-white rounded-md shadow-lg px-10 py-3'>
             <Text className='text-black font-medium'>Logout</Text>
         </View>
       )}
+      </View>
 
-      <View  style={{ height: 43}}  className='pt-3 justify-between items-center px-4'>
+
+      <View  style={{ height: 43}}  className='justify-between items-center px-4'>
       <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
@@ -87,66 +172,41 @@ const Home = () => {
         </ScrollView>
         </View>
 
-        <View style={{ flex: 1, alignItems: 'center', paddingTop: 0 }}>
-          <Swiper
-          containerStyle={{
-            flex: 0,        // prevent vertical expansion
-            marginTop: -hp(6),
-          }}
-            cards={cards}
-            renderCard={(card) => (
-              <View key={card.id} style={{
-                borderRadius: 24,
-                overflow: 'hidden',
-                // backgroundColor: '#fff',
-                height: hp(70),
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                // marginTop:-55
-              }}
-              className='mx-5'
-              >
-                <Image
-                  source={card.image}
-                  style={{ width: '100%', height: '100%', position: 'absolute', resizeMode: 'cover' }}
-                />
-                <LinearGradient
-                  colors={['transparent', 'rgba(17,19,31,0.95)']}
-                  style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '55%' }}
-                />
-                <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 24 }}>
-                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 24, marginBottom: 8 }}>{card.title}</Text>
-                  <Text style={{ color: '#fff', opacity: 0.7, fontSize: 14, marginBottom: 8 }}>{card.subtitle}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <View style={{ width: 32, height: 50, borderRadius: 16, backgroundColor: '#fff', marginRight: 8, justifyContent: 'center', alignItems: 'center' }}>
-                      <Text style={{ color: '#11131F', fontWeight: 'bold' }}>{card.author[0]}</Text>
-                    </View>
-                    <Text style={{ color: '#fff', fontWeight: '500', fontSize: 16 }}>Published by {card.author}</Text>
-                  </View>
-                  <Text style={{ color: '#fff', fontSize: 15 }}>{card.description}</Text>
-                </View>
-              </View>
-            )}
-            backgroundColor={'transparent'}
-            cardHorizontalMargin={0}
-            stackSize={5}
-            cardIndex={0}
-            showSecondCard={true}
-            stackSeparation={15}
-            // infinite={true}
-            // disableTopSwipe={false}
-            // disableBottomSwipe={false}
-            // verticalSwipe={false}
+
+        <View style={{flex:1}}>
+          {cards.map((item, index)=> {
+
+            const isFirst = index === 0
+            const dragHandler = isFirst ? panResponder.panHandlers : {};
             
-          />
+            return <TInderCard 
+            key={item.id ?? index} 
+            item={item} 
+            swipe={swipe}
+            isFirst={isFirst}
+            {...dragHandler}
+            />
+          }).reverse()}
+
         </View>
-          
+
+        {cards.length === 0 && (
+        <TouchableOpacity
+          onPress={() => setData(originalCards)}
+          style={{ position: 'absolute', bottom: 100, alignSelf: 'center', backgroundColor: "black"}}
+        >
+          <Text style={{ fontSize: 20, color: 'white' }}>Restart</Text>
+        </TouchableOpacity>
+      )}
 
 
 
-    </View>
+        
+
+
+
+</View>
+</SafeAreaView>
   );
 };
 

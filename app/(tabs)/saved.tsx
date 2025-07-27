@@ -1,11 +1,11 @@
 import { Text, View } from 'react-native'
 
-const bookmarked = () => {
+const Saved = () => {
   return (
     <View>
-      <Text>bookmarked</Text>
+      <Text>saved</Text>
     </View>
   )
 }
 
-export default bookmarked
+export default Saved

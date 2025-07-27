@@ -1,3 +1,4 @@
+import { TabBar } from "@/components/tabs";
 import { Tabs } from "expo-router";
 import { Bookmark, Chrome as HomeIcon, Search } from "lucide-react-native";
 import "../globals.css";
@@ -5,6 +6,7 @@ import "../globals.css";
 export default function TabLayout() {
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -33,9 +35,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="bookmarked"
+        name="saved"
         options={{
-          title: "Bookmarked",
+          title: "saved",
           tabBarIcon: ({ color }) => <Bookmark color={color} />,
         }}
       />
