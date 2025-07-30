@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useRef, useState } from 'react';
 import {
@@ -88,6 +89,21 @@ const Explore = () => {
 
   const { height: screenHeight } = Dimensions.get('window');
 
+  const router = useRouter();
+  const handlePress = (item) => {
+      router.push({
+        pathname: '/news/[id]',
+        params: {
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle,
+          description: item.description,
+          image: Image.resolveAssetSource(item.image).uri,
+          author: item.author,
+        },
+      });
+    };
+
   return (
     <SafeAreaView className="flex-1 bg-[#11131F]">
       <StatusBar style="dark" />
@@ -164,6 +180,7 @@ const Explore = () => {
           snapToAlignment="start"
           contentContainerStyle={{ gap: 20 }}
           renderItem={({ item }) => (
+            <TouchableOpacity onPress={()=>handlePress(item)}>
             <View style={{ height: screenHeight * 0.79 }}>
               <View
                 style={{
@@ -199,6 +216,7 @@ const Explore = () => {
                 </View>
               </View>
             </View>
+            </TouchableOpacity>
           )}
         />
       </View>

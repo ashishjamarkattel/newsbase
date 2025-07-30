@@ -1,13 +1,31 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
+const router = useRouter();
+  const handlePress = (item) => {
+      router.push({
+        pathname: '/news/[id]',
+        params: {
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle,
+          description: item.description,
+          image: Image.resolveAssetSource(item.image).uri,
+          author: item.author,
+        },
+      });
+    };
+
+    
 const NewsCard = ({ item }) => {
   return (
     <TouchableOpacity 
       style={styles.cardContainer} 
       activeOpacity={0.9}
+      onPress={()=>handlePress(item)}
     >
       <View style={styles.cardWrapper}>
         <ImageBackground
