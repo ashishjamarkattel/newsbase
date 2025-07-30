@@ -1,4 +1,6 @@
+import CategoryBottomSheet from '@/components/bottomsheet';
 import TInderCard from '@/components/Cards/TInderCard';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -13,7 +15,10 @@ import {
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+
 const Home = () => {
+  
+  
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const sources = ['Kantipur', 'Setopati', 'Himalayan', 'Kathmandu Post', 'Online Khabar', 'Republica'];
   const categoryStyles = {
@@ -50,6 +55,18 @@ const Home = () => {
   ]);
 
 
+  const allCategories = [
+    "All", 'Environment', 'Economy', 'Education', 'Business',
+    'Politics', 'Science', 'Health', 'Sports', 'Technology',
+    'Entertainment'
+  ];
+
+  const sheetRef = useRef<BottomSheet>(null);
+  
+  const handleSelectCategory = (category: any) => {
+    console.log('Selected category:', category);
+    // Do something with category
+  };
 
 
   const originalCards = useRef([
@@ -126,7 +143,8 @@ const Home = () => {
 
 
   return (
-// bg-[#11131F]
+
+    // ##header
     <SafeAreaView className='flex-1 bg-[#11131F]'>
     <View className='flex-1 bg-[#11131F]'>
       <StatusBar style='dark' />
@@ -137,22 +155,14 @@ const Home = () => {
           style={{ width: wp(30), height: hp(10)}} 
           resizeMode="contain"
         />
-         <TouchableOpacity onPress={() => setDropdownOpen(!dropdownOpen)}>
-        <Image
-          source={require("../../assets/images/dropdown.png")}
-          style={{ width: wp(10), height: hp(10)}} 
-          resizeMode="contain"
-          className='mr-3'
-        />
+         <TouchableOpacity onPress={() => sheetRef.current?.expand()}>
+          <Image
+            source={require("../../assets/images/dropdown.png")}
+            style={{ width: wp(10), height: hp(10), marginRight: 12 }}
+            resizeMode="contain"
+          />
         </TouchableOpacity>
-
-        {dropdownOpen && (
-        <View className='absolute right-4 top-[50] bg-white rounded-md shadow-lg px-10 py-3'>
-            <Text className='text-black font-medium'>Logout</Text>
-        </View>
-      )}
       </View>
-
 
       <View  style={{ height: 43}}  className='justify-between items-center px-4'>
       <ScrollView 
@@ -199,11 +209,7 @@ const Home = () => {
         </TouchableOpacity>
       )}
 
-
-
-        
-
-
+  <CategoryBottomSheet ref={sheetRef} onSelect={handleSelectCategory} />
 
 </View>
 </SafeAreaView>
